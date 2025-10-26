@@ -2,44 +2,148 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fetch /terms Demo</title>
+  <title>AJAX Frontend Demo - Final</title>
+  <script src="https://cdn.tailwindcss.com"></script> 
 </head>
-<body>
-  <h1>Fetch https://mil.psy.ntu.edu.tw:5000/terms</h1>
-  <button id="btn">Fetch again</button>
-  <pre id="out">Loading…</pre>
+<body class="bg-gray-50 p-8 font-sans">
+  <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-8 space-y-10">
+    <header class="text-center pb-4 border-b">
+        <h1 class="text-4xl font-extrabold text-indigo-700">🧠 Backend AJAX Frontend</h1>
+        <p class="text-gray-500 mt-2">Connecting to: https://mil.psy.ntu.edu.tw:5000</p>
+    </header>
+
+    <section>
+        <h2 class="text-2xl font-bold mb-4 text-indigo-600">1. 查詢所有詞彙：`/terms`</h2>
+        <div class="flex items-center space-x-4 mb-4">
+            <button id="btnFetchTerms" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out shadow-md">
+                獲取所有詞彙
+            </button>
+        </div>
+        <pre id="outAllTerms" class="bg-gray-100 text-gray-700 p-4 rounded-lg overflow-auto text-sm min-h-[50px] max-h-96">...</pre>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-bold mb-4 text-indigo-600">2. 查詢特定詞彙相關項：`/terms/<t1>` (即時 AJAX)</h2>
+        <div class="flex space-x-4 mb-4">
+            <input type="text" id="termInput" placeholder="輸入詞彙，例如: amygdala" class="flex-grow border-gray-300 border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="amygdala">
+            </div>
+        <pre id="outTermQuery" class="bg-gray-100 text-gray-700 p-4 rounded-lg overflow-auto text-sm min-h-[50px] max-h-96">請在上方輸入詞彙以查詢。</pre>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-bold mb-4 text-indigo-600">3. 執行邏輯查詢：`/query/<q_string>/studies` (即時 AJAX)</h2>
+        <div class="mb-2 text-sm text-gray-500">範例：`amygdala not emotion`，**請用空格分隔**。</div>
+        <div class="flex space-x-4 mb-4">
+            <input type="text" id="queryString" placeholder="輸入查詢字串，例如: hippocampus and memory" class="flex-grow border-gray-300 border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="amygdala not emotion">
+            </div>
+        <pre id="outLogicQuery" class="bg-gray-100 text-gray-700 p-4 rounded-lg overflow-auto text-sm min-h-[50px] max-h-96">請在上方輸入查詢字串。</pre>
+    </section>
+    
+  </div>
 
   <script>
-    async function fetchTerms() {
-      const out = document.getElementById('out');
-      out.textContent = 'Requesting…';
-      try {
-        const resp = await fetch('https://mil.psy.ntu.edu.tw:5000/terms');
-        let info = `HTTP ${resp.status} ${resp.statusText}\n`;
-        const ct = resp.headers.get('content-type') || '';
+    // 💥 修改 5: 定義基礎 URL，方便維護 💥
+    const API_BASE = 'https://mil.psy.ntu.edu.tw:5000';
 
-        if (!resp.ok) {
-          const text = await resp.text();
-          out.textContent = info + '\n' + text;
-          return;
-        }
+    /**
+     * 💥 修改 6: 建立通用的 Fetch 函式，處理所有 API 呼叫的邏輯 💥
+     * @param {string} url - 完整的 API URL
+     * @param {HTMLElement} outputElement - 顯示結果的 <pre> 元素
+     */
+    async function executeFetch(url, outputElement) {
+        outputElement.textContent = 'Requesting...';
+        
+        // 錯誤處理函式，確保在錯誤時顯示紅色提示
+        const handleError = (err) => {
+            outputElement.textContent = 
+                `Error: ${err && err.message ? err.message : String(err)}\n\n` +
+                `Common causes:\n1) CORS not allowed by the server\n2) Running without a local server\n3) Network/server issues`;
+            outputElement.classList.remove('text-green-400', 'bg-gray-800');
+            outputElement.classList.add('text-red-500', 'bg-red-50');
+        };
 
-        if (ct.includes('application/json')) {
-          const data = await resp.json();
-          out.textContent = info + '\n' + JSON.stringify(data, null, 2);
-        } else {
-          const text = await resp.text();
-          out.textContent = info + '\n' + text;
+        try {
+            const resp = await fetch(url);
+            let info = `[API Call Success] HTTP ${resp.status} ${resp.statusText}\n`;
+            
+            outputElement.classList.remove('text-red-500', 'bg-red-50'); // 清除錯誤樣式
+
+            if (!resp.ok) {
+                const text = await resp.text();
+                outputElement.textContent = info + '\n' + text;
+                return;
+            }
+
+            const ct = resp.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+                const data = await resp.json();
+                outputElement.textContent = info + '\n' + JSON.stringify(data, null, 2);
+            } else {
+                const text = await resp.text();
+                outputElement.textContent = info + '\n' + text;
+            }
+        } catch (err) {
+            handleError(err);
         }
-      } catch (err) {
-        document.getElementById('out').textContent =
-          'Error: ' + (err && err.message ? err.message : String(err)) +
-          '\n\nCommon causes:\n1) CORS not allowed by the server\n2) Opening this file via file:// instead of a local server\n3) Network/server issues';
-      }
     }
 
-    document.getElementById('btn').addEventListener('click', fetchTerms);
-    fetchTerms();
+    // 1. 查詢所有詞彙：/terms (點擊按鈕觸發)
+    async function fetchAllTerms() {
+        const out = document.getElementById('outAllTerms');
+        // 確保 /terms 輸出使用特殊的深色樣式
+        // out.classList.add('text-green-400', 'bg-gray-800'); 
+        await executeFetch(`${API_BASE}/terms`, out);
+    }
+
+    // 2. 查詢特定詞彙相關項：/terms/<t1> (輸入即時觸發)
+    async function fetchTermQuery() {
+        const term = document.getElementById('termInput').value.trim();
+        const out = document.getElementById('outTermQuery');
+        out.classList.remove('text-green-400', 'bg-gray-800'); // 使用一般樣式
+
+        if (!term) {
+            out.textContent = "請輸入一個詞彙 (e.g., amygdala) 以即時查詢。";
+            return;
+        }
+
+        const url = `${API_BASE}/terms/${encodeURIComponent(term)}`;
+        await executeFetch(url, out);
+    }
+
+    // 3. 執行邏輯查詢：/query/<q_string>/studies (輸入即時觸發)
+    async function fetchLogicQuery() {
+        const query = document.getElementById('queryString').value.trim();
+        const out = document.getElementById('outLogicQuery');
+        out.classList.remove('text-green-400', 'bg-gray-800'); // 使用一般樣式
+
+        if (!query) {
+            out.textContent = "請輸入一個邏輯查詢字串 (e.g., hippocampus and memory) 以即時查詢。";
+            return;
+        }
+
+        // 必須對查詢字串進行編碼 (例如將空格轉為 %20)
+        const url = `${API_BASE}/query/${encodeURIComponent(query)}/studies`;
+        await executeFetch(url, out);
+    }
+
+    // 💥 修改 7: 綁定事件監聽器 - 實現即時搜索 💥
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. /terms 仍由按鈕觸發
+        document.getElementById('btnFetchTerms').addEventListener('click', fetchAllTerms);
+        
+        // 2. /terms/<t1> 改為監聽輸入框的 'input' 事件 (即時搜索)
+        document.getElementById('termInput').addEventListener('input', fetchTermQuery);
+        
+        // 3. /query/.../studies 改為監聽輸入框的 'input' 事件 (即時搜索)
+        document.getElementById('queryString').addEventListener('input', fetchLogicQuery);
+
+        // 頁面載入時，自動執行 /terms 和兩次即時查詢 (使用預設值)
+        fetchAllTerms();
+        fetchTermQuery(); // 立即查詢預設的 'amygdala'
+        fetchLogicQuery(); // 立即查詢預設的 'amygdala not emotion'
+    });
+
+    
   </script>
 </body>
 </html>
