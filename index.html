@@ -2,20 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AJAX Frontend Demo - Final</title>
+  <title>AJAX Frontend Demo </title>
   <script src="https://cdn.tailwindcss.com"></script> 
 </head>
-<body class="bg-gray-50 p-8 font-sans">
+<body class="bg-pink-50 p-8 font-sans">
   <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-8 space-y-10">
-    <header class="text-center pb-4 border-b">
-        <h1 class="text-4xl font-extrabold text-indigo-700">🧠 Backend AJAX Frontend</h1>
-        <p class="text-gray-500 mt-2">Connecting to: https://mil.psy.ntu.edu.tw:5000</p>
+    <header class="text-center pb-4 border-b border-fuchsia-200">
+        <h1 class="text-4xl font-extrabold text-fuchsia-700">🧠 Neurosynth Frontend</h1>
+        <p class="text-fuchsia-400 mt-2">Connecting to: https://hpc.psy.ntu.edu.tw:5000</p>
     </header>
 
     <section>
-        <h2 class="text-2xl font-bold mb-4 text-indigo-600">1. 查詢所有詞彙：`/terms`</h2>
+        <h2 class="text-2xl font-bold mb-4 text-purple-600">1. 查詢所有詞彙 look up all available terms：</h2>
         <div class="flex items-center space-x-4 mb-4">
-            <button id="btnFetchTerms" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out shadow-md">
+            <button id="btnFetchTerms" class="bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out shadow-md">
                 獲取所有詞彙
             </button>
         </div>
@@ -23,30 +23,31 @@
     </section>
 
     <section>
-        <h2 class="text-2xl font-bold mb-4 text-indigo-600">2. 查詢特定詞彙相關項：`/terms/<t1>` (即時 AJAX)</h2>
+        <h2 class="text-2xl font-bold mb-4 text-purple-600">2. 查詢特定詞彙相關 look up terms associated with t1：</h2>
         <div class="flex space-x-4 mb-4">
-            <input type="text" id="termInput" placeholder="輸入詞彙，例如: amygdala" class="flex-grow border-gray-300 border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="amygdala">
+            <input type="text" id="termInput" placeholder="輸入詞彙，例如: amygdala" class="flex-grow border-gray-300 border p-2 rounded-lg focus:ring-pink-500 focus:border-pink-500" value="amygdala">
             </div>
         <pre id="outTermQuery" class="bg-gray-100 text-gray-700 p-4 rounded-lg overflow-auto text-sm min-h-[50px] max-h-96">請在上方輸入詞彙以查詢。</pre>
     </section>
 
     <section>
-        <h2 class="text-2xl font-bold mb-4 text-indigo-600">3. 執行邏輯查詢：`/query/<q_string>/studies` (即時 AJAX)</h2>
+        <h2 class="text-2xl font-bold mb-4 text-purple-600">3. 執行邏輯查詢： logical search</h2>
         <div class="mb-2 text-sm text-gray-500">範例：`amygdala not emotion`，**請用空格分隔**。</div>
         <div class="flex space-x-4 mb-4">
-            <input type="text" id="queryString" placeholder="輸入查詢字串，例如: hippocampus and memory" class="flex-grow border-gray-300 border p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="amygdala not emotion">
+            <input type="text" id="queryString" placeholder="輸入查詢字串，例如: hippocampus and memory" class="flex-grow border-gray-300 border p-2 rounded-lg focus:ring-pink-500 focus:border-pink-500" value="amygdala not emotion">
             </div>
         <pre id="outLogicQuery" class="bg-gray-100 text-gray-700 p-4 rounded-lg overflow-auto text-sm min-h-[50px] max-h-96">請在上方輸入查詢字串。</pre>
     </section>
     
   </div>
+</body>
 
   <script>
-    // 💥 修改 5: 定義基礎 URL，方便維護 💥
-    const API_BASE = 'https://mil.psy.ntu.edu.tw:5000';
+    // 💥 定義基礎 URL 💥
+    const API_BASE = 'https://hpc.psy.ntu.edu.tw:5000';
 
     /**
-     * 💥 修改 6: 建立通用的 Fetch 函式，處理所有 API 呼叫的邏輯 💥
+     * 💥 建立通用的 Fetch 函式，處理所有 API 呼叫的邏輯 💥
      * @param {string} url - 完整的 API URL
      * @param {HTMLElement} outputElement - 顯示結果的 <pre> 元素
      */
@@ -126,7 +127,7 @@
         await executeFetch(url, out);
     }
 
-    // 💥 修改 7: 綁定事件監聽器 - 實現即時搜索 💥
+    // 💥 綁定事件監聽器 - 實現即時搜索 💥
     document.addEventListener('DOMContentLoaded', () => {
         // 1. /terms 仍由按鈕觸發
         document.getElementById('btnFetchTerms').addEventListener('click', fetchAllTerms);
