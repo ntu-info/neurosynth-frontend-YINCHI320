@@ -6,4 +6,4 @@ Neurosynth Frontend
 # 與AI討論過程：
 ChatGPT：https://chatgpt.com/share/68feea97-bf28-8005-be16-16f57a29d072
 
-Gemini：https://gemini.google.com/share/c0962691a593
+Gemini：https://gemini.google.com/share/eb37d4841523
